@@ -8,4 +8,6 @@ urlpatterns = [
     path('acceso_base_datos/', views.acceso_base_datos, name='acceso_base_datos'),
     path('procesar_registro/', views.procesar_registro, name='procesar_registro'),
     path('procesar_login/', views.procesar_login, name='procesar_login'),
+    path('diagnostic/', views.diagnostic_view, name='diagnostic'),
+    path('diagnostic_template/', views.diagnostic_template, name='diagnostic_template'),
 ]
