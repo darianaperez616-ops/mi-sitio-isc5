@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html lang=\"es\">
+<head>
+    <meta charset=\"UTF-8\">
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+    <title>Base de Datos</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #8B5FBF, #6A0DAD);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #6A0DAD;
+            text-align: center;
+        }
+        
+        .back-btn {
+            background: #6A0DAD;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .user-list {
+            margin-top: 20px;
+        }
+        
+        .user-item {
+            background: #f8f8f8;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #6A0DAD;
+        }
+    </style>
+</head>
+<body>
+    <div class=\"container\">
+        <a href=\"/usuarios/login/\" class=\"back-btn\">← Volver al Login</a>
+        <h1>Base de Datos</h1>
+        
+        <div class=\"user-list\">
+            <h3>Usuarios Registrados:</h3>
+            {% if users %}
+                {% for user in users %}
+                    <div class=\"user-item\">
+                        <strong>Usuario:</strong> {{ user.username }}<br>
+                        <strong>Email:</strong> {{ user.email }}<br>
+                        <strong>Fecha registro:</strong> {{ user.date_joined|date:\"d/m/Y H:i\" }}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No hay usuarios registrados aún.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
