@@ -41,4 +41,7 @@ urlpatterns = [
     path('guardar_puntaje/', views.guardar_puntaje, name='guardar_puntaje'),
 
 
+
+
+
 ]
