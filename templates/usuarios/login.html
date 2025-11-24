@@ -17,7 +17,6 @@
       position: relative;
     }
 
-    /* Botón base de datos arriba a la derecha */
     .btn-db {
       position: absolute;
       top: 20px;
@@ -85,38 +84,23 @@
       text-decoration: underline;
       text-align: center;
     }
-
-    .messages {
-      color: #ffdede;
-      margin-bottom: 10px;
-      text-align: left;
-    }
   </style>
 </head>
 <body>
-  <a href=\"{% url 'acceso_base_datos' %}\">
+  <a href=\"/usuarios/acceso_base_datos/\">
     <button class=\"btn-db\">Base de Datos</button>
   </a>
 
   <div class=\"card\">
     <h2>Iniciar sesión</h2>
 
-    {% if messages %}
-      <div class=\"messages\">
-        {% for message in messages %}
-          • {{ message }}<br>
-        {% endfor %}
-      </div>
-    {% endif %}
-
-    <form method=\"post\">
-      {% csrf_token %}
+    <form method=\"post\" action=\"/usuarios/login/\">
       <input name=\"email\" type=\"email\" placeholder=\"Correo electrónico\" required>
       <input name=\"password\" type=\"password\" placeholder=\"Contraseña\" required>
       <button class=\"btn\" type=\"submit\">Entrar</button>
     </form>
 
-    <a class=\"link\" href=\"{% url 'registro' %}\">¿No tienes cuenta? Regístrate</a>
+    <a class=\"link\" href=\"/usuarios/registro/\">¿No tienes cuenta? Regístrate</a>
   </div>
 </body>
 </html>
