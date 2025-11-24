@@ -1,0 +1,157 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DarSign - Configuración</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{
+      font-family:'Press Start 2P',cursive;
+      background-image:url("{% static 'imagenes/fondo.png' %}");
+      background-size:cover;
+      background-repeat:no-repeat;
+      background-position:center;
+      color:#fff;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:100vh;
+      text-align:center;
+      padding:10px;
+    }
+    .container{
+      background:rgba(0,0,0,0.7);
+      padding:40px 50px;
+      border:4px solid #ff00cc;
+      border-radius:20px;
+      box-shadow:0 0 35px #ff00cc;
+      max-width:600px;
+      width:100%;
+    }
+    h1{
+      font-size:2.5em;
+      margin-bottom:15px;
+      text-shadow:2px 2px 0 #000;
+    }
+    .linea-deco{
+      width:120px;
+      height:8px;
+      background:#ff00cc;
+      margin:0 auto 25px;
+      border-radius:4px;
+    }
+    .buttons{
+      display:flex;
+      flex-direction:column;
+      gap:20px;
+      margin-top:20px;
+    }
+
+    /* BOTONES IGUALES A juego.html */
+    button{
+      padding:18px 25px;
+      font-size:1.4em;
+      font-family:'Press Start 2P',cursive;
+      color:#fff;
+      border:3px solid #fff;
+      border-radius:10px;
+      cursor:pointer;
+      text-shadow:1px 1px 0 #000;
+      box-shadow:0 6px 0 #cc00aa;
+      transition:0.3s;
+    }
+    button:hover{
+      transform:scale(1.05);
+      text-shadow:2px 2px 5px #ff99ff;
+    }
+    button:active{
+      transform:translateY(4px);
+      box-shadow:0 2px 0 #cc00aa;
+    }
+
+    /* Colores por opción */
+    button.pantalla { background-color:#4dd2ff; border-color:#99e6ff; }
+    button.pantalla:hover { background-color:#1ab2e0; }
+
+    button.creditos { background-color:#ffd24d; border-color:#ffee99; }
+    button.creditos:hover { background-color:#e0b31a; }
+
+    button.encuesta { background-color:#7dff4d; border-color:#b3ff99; }
+    button.encuesta:hover { background-color:#5ae00f; }
+
+    button.volver { background-color:#ff00cc; border-color:#ff99ff; }
+    button.volver:hover { background-color:#cc00aa; }
+
+    /* Modo oscuro */
+    body.dark-mode{
+      background-color:#000;
+      color:#ffccff;
+      background-image:url('{% static "images/fondo2.png" %}');
+    }
+    body.dark-mode .container{
+      background:rgba(20,20,20,0.9);
+      border-color:#471786;
+      box-shadow:0 0 35px #471786;
+    }
+    body.dark-mode .linea-deco{background:#ff00cc;}
+    body.dark-mode button.volver{
+      background-color:#471786;
+      border-color:#ff00cc;
+    }
+    body.dark-mode button.volver:hover{
+      background-color:#5f219e;
+      text-shadow:2px 2px 5px #ff99ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>CONFIGURACIÓN</h1>
+    <div class="linea-deco"></div>
+
+    <div class="buttons">
+      <button class="pantalla" onclick="toggleDarkMode()">PANTALLA</button>
+      <button class="creditos" data-href="{% url 'creditos' %}">CRÉDITOS</button>
+      <button class="encuesta" data-href="{% url 'encuesta' %}">ENCUESTA</button>
+      <button class="volver" data-href="{% url 'opciones' %}">VOLVER</button>
+    </div>
+  </div>
+
+  <script>
+    // Modo oscuro
+    function toggleDarkMode() {
+      const dark = document.body.classList.toggle('dark-mode');
+      localStorage.setItem('darkMode', dark);
+    }
+    if(localStorage.getItem('darkMode')==='true') document.body.classList.add('dark-mode');
+
+    // Sonido click
+    function isSoundEnabled() {
+      const val = localStorage.getItem('soundEnabled');
+      return val === null || val === 'true';
+    }
+    function playClick() {
+      if(isSoundEnabled()){
+        const click = new Audio('{% static "sonidos/click.mp3" %}');
+        click.play().catch(()=>{});
+      }
+    }
+
+    document.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', function(e){
+        playClick();
+        const href = this.dataset.href;
+        if(href){
+          e.preventDefault();
+          setTimeout(()=>{location.href=href;},100);
+        }
+      });
+    });
+  </script>
+
+  <audio id="musicaFondo" src="{% static 'sonidos/musica.mpeg' %}" loop autoplay></audio>
+</body>
+</html>

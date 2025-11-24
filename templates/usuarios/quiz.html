@@ -1,0 +1,187 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>DarSign - Quiz Morado</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+* {margin:0; padding:0; box-sizing:border-box;}
+body {
+  background-image:url("{% static 'imagenes/fondo.png' %}");
+  font-family:'Press Start 2P', cursive;
+  background: linear-gradient(135deg, #7b1aff 0%, #4a00b5 100%);
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  padding:20px;
+  min-height:100vh;
+}
+.container {
+  background: rgba(0,0,0,0.75);
+  border: 4px solid #9b30ff;
+  border-radius: 20px;
+  box-shadow: 0 0 35px #9b30ff;
+  padding: 30px 40px;
+  max-width: 600px;
+  width: 100%;
+  text-align:center;
+  position: relative;
+}
+h1 {
+  font-size: 1.8em;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 0 #000;
+}
+.game-container img {
+  width: 180px;
+  height: 180px;
+  border: 4px solid #9b30ff;
+  border-radius: 20px;
+  background: white;
+  object-fit: contain;
+  margin-bottom: 25px;
+}
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.options button, button.volver, #message button {
+  font-family:'Press Start 2P', cursive;
+  padding:18px 25px;
+  font-size:1.2em;
+  color:#fff;
+  border:4px solid #8a2be2;
+  border-radius:14px;
+  background-color:#a64dff;
+  cursor:pointer;
+  box-shadow:0 6px 0 #6f00b8;
+  transition:0.3s;
+}
+.options button:hover, button.volver:hover, #message button:hover {
+  background-color:#922aff;
+  transform:scale(1.05);
+  text-shadow:2px 2px 5px #d1b3ff;
+}
+.options button:active, button.volver:active, #message button:active {
+  transform:translateY(4px);
+  box-shadow:0 4px 0 #6f00b8;
+}
+.result {
+  font-size: 1.2em;
+  margin-top: 20px;
+  font-weight:bold;
+  color:#fff;
+}
+#message {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  background: rgba(0,0,0,0.85);
+  border:4px solid #8a2be2;
+  border-radius:20px;
+  box-shadow:0 0 35px #9b30ff;
+  padding:40px 50px;
+  font-size:1.2em;
+  display:none;
+  flex-direction: column;
+  align-items: center;
+  z-index:10;
+  color:#fff;
+}
+@media(max-width:768px){
+  .game-container img { width:140px; height:140px; }
+  h1 { font-size:1.4em; }
+  .options button, button.volver, #message button { font-size:1em; padding:14px 20px; }
+  #message { font-size:1em; padding:30px 35px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>¿Qué significa esta seña?</h1>
+  <div class="game-container">
+    <img id="question-image" src="" alt="Imagen de seña">
+    <div class="options" id="options"></div>
+    <p class="result" id="result"></p>
+  </div>
+
+  <a href="{% url 'juegos' %}"><button class="volver">Volver</button></a>
+
+  <div id="message">
+    <span>🎉 ¡Muy bien! Has terminado el quiz 🎉</span>
+    <button id="restart">Reiniciar Juego</button>
+  </div>
+</div>
+
+<script>
+const cards = [
+  { palabra: 'por favor', imagen: '{% static "imagenes/por favor.jpg" %}' },
+  { palabra: 'no', imagen: '{% static "imagenes/no.jpg" %}' },
+  { palabra: 'perdón', imagen: '{% static "imagenes/perdón.jpg" %}' },
+  { palabra: 'sí', imagen: '{% static "imagenes/sí.jpg" %}' },
+  { palabra: 'gracias', imagen: '{% static "imagenes/gracias.jpg" %}' }
+];
+
+const imageEl = document.getElementById("question-image");
+const optionsEl = document.getElementById("options");
+const resultEl = document.getElementById("result");
+const messageBox = document.getElementById("message");
+const restartBtn = document.getElementById("restart");
+
+let remainingQuestions = [...cards];
+
+function newQuestion() {
+  resultEl.textContent = "";
+
+  if(remainingQuestions.length === 0){
+    messageBox.style.display = 'flex';
+    return;
+  }
+
+  const correct = remainingQuestions[Math.floor(Math.random() * remainingQuestions.length)];
+
+  let options = [correct.palabra];
+  while(options.length < 3){
+    let randomWord = cards[Math.floor(Math.random() * cards.length)].palabra;
+    if(!options.includes(randomWord)) options.push(randomWord);
+  }
+
+  options = options.sort(() => Math.random() - 0.5);
+  imageEl.src = correct.imagen;
+  optionsEl.innerHTML = "";
+
+  options.forEach(opt=>{
+    const btn = document.createElement("button");
+    btn.textContent = opt;
+    btn.onclick = ()=>{
+      if(opt === correct.palabra){
+        resultEl.textContent = "✅ ¡Correcto!";
+        resultEl.style.color = "lime";
+      } else {
+        resultEl.textContent = "❌ Incorrecto. Era: " + correct.palabra;
+        resultEl.style.color = "red";
+      }
+      remainingQuestions = remainingQuestions.filter(q => q !== correct);
+      setTimeout(newQuestion,1500);
+    };
+    optionsEl.appendChild(btn);
+  });
+}
+
+restartBtn.addEventListener('click', ()=>{
+  remainingQuestions = [...cards];
+  messageBox.style.display='none';
+  newQuestion();
+});
+
+newQuestion();
+</script>
+
+<audio id="musicaFondo" src="{% static 'sonidos/musica.mpeg' %}" loop autoplay></audio>
+
+</body>
+</html>

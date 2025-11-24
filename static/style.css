@@ -1,0 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+
+body {
+  font-family: 'Press Start 2P', cursive;
+  background-image: url('imagenes/fondo.png'); /* tu fondo */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed; /* hace que no se mueva */
+  margin: 0;
+  padding: 0;
+}
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Press Start 2P', cursive;
+  background-image: url('/imagenes/fondo.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+  transition: background-color 0.3s ease, color 0.3s ease, background-image 0.3s ease;
+  padding: 20px;
+}
+
+.container {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 40px 30px;
+  border: 4px solid #ff00cc;
+  border-radius: 15px;
+  box-shadow: 0 0 25px #ff00cc;
+  max-width: 480px;
+  width: 100%;
+}
+
+h1 {
+  font-size: 2em;
+  margin-bottom: 20px;
+  color: #ffffff;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.linea-deco {
+  width: 120px;
+  height: 6px;
+  background: #ff00cc;
+  margin: 0 auto 30px;
+  border-radius: 3px;
+}
+
+.setting-group {
+  margin-bottom: 30px;
+}
+
+label {
+  display: block;
+  font-size: 1em;
+  color: #ffccff;
+  margin-bottom: 10px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 70px;
+  height: 38px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 38px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 30px;
+  width: 30px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #ff00cc;
+}
+
+input:checked + .slider:before {
+  transform: translateX(32px);
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+button {
+  padding: 15px;
+  font-size: 1.2em;
+  background-color: #ff00cc;
+  color: #ffffff;
+  border: 5px solid #ffffff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  text-shadow: 1px 1px 0 #000;
+  font-family: 'Press Start 2P', cursive;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+}
+
+button:hover {
+  background-color: #cc00aa;
+  transform: scale(1.05) translateY(-2px);
+}
+
+button:active {
+  transform: scale(1) translateY(2px);
+}
+
+/* 🌙 Modo oscuro para todas las páginas */
+body.dark-mode {
+  background-image: url('/imagenes/fondo2.png');
+  color: #ffccff;
+}
+
+/* Estilos específicos para la configuración */
+body.config.dark-mode {
+  background-image: url('/imagenes/fondo2.png');
+  color: #ffffff;
+  transition: background 0.3s ease;
+}
+
+body.config .container {
+  background: rgba(20, 20, 20, 0.9);
+  border-color: #471786;
+  box-shadow: 0 0 25px #471786;
+}
+
+body.config.dark-mode .linea-deco {
+  background: #471786;
+}
+
+body.config.dark-mode label {
+  color: #ffccff;
+}
+
+body.config.dark-mode button {
+  background-color: #471786;
+  color: #000;
+  border-color: #ff00cc;
+}
+
+body.config.dark-mode button:hover {
+  background-color: #5f219e;
+}
+
+

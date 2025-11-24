@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Editar Configuración</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family:'Poppins',sans-serif; background:#f0f2f5; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
+    .card { background:#fff; padding:30px; border-radius:15px; box-shadow:0 10px 25px rgba(0,0,0,0.1); width:350px; }
+    h2 { text-align:center; color:#5b2bc0; margin-top:0; }
+    input, select { width:100%; padding:10px; margin:12px 0; border-radius:8px; border:1px solid #ccc; }
+    .btn { width:100%; padding:12px; border:none; border-radius:25px; background:#5b2bc0; color:#fff; font-weight:600; cursor:pointer; transition:.2s; margin-top:10px; }
+    .btn:hover { background:#7f3ff2; }
+    .btn-volver { display:inline-block; margin-bottom:15px; text-decoration:none; color:#5b2bc0; font-weight:600; }
+    .messages { color:#ff4d4f; margin-bottom:10px; text-align:center; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <a href="{% url 'mostrar_base_datos' %}" class="btn-volver">← Volver</a>
+    <h2>Editar Configuración</h2>
+
+    {% for message in messages %}
+      <div class="messages">{{ message }}</div>
+    {% endfor %}
+
+    <form method="post">
+      {% csrf_token %}
+      <input type="text" name="sonido" placeholder="Sonido" value="{{ config.sonido }}" required>
+      <select name="dificultad" required>
+        <option value="Fácil" {% if config.dificultad == "Fácil" %}selected{% endif %}>Fácil</option>
+        <option value="Medio" {% if config.dificultad == "Medio" %}selected{% endif %}>Medio</option>
+        <option value="Difícil" {% if config.dificultad == "Difícil" %}selected{% endif %}>Difícil</option>
+      </select>
+      <button type="submit" class="btn">Guardar Cambios</button>
+    </form>
+  </div>
+</body>
+</html>

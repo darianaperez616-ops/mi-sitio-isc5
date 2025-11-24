@@ -1,0 +1,314 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Memorama - Imágenes y Palabras</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background-image:url("{% static 'imagenes/fondo.png' %}");
+  font-family:'Press Start 2P', cursive;
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  padding:20px;
+  min-height:100vh;
+}
+
+.container {
+  background: rgba(0,0,0,0.75);
+  border: 4px solid #8a2be2;
+  border-radius: 20px;
+  box-shadow: 0 0 30px #8a2be2;
+  padding: 30px 40px;
+  max-width: 1000px;
+  width: 100%;
+  text-align:center;
+  position: relative;
+}
+
+h1 {
+  font-size: 1.8em;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.game-board {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-auto-rows: auto;
+  gap: 25px;
+  justify-items: center;
+  margin-bottom: 25px;
+}
+
+.card {
+  position: relative;
+  width: 120px;
+  height: 160px;
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.card.flipped .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 4px solid #8a2be2;
+  border-radius: 20px;
+  backface-visibility: hidden;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-family:'Press Start 2P', cursive;
+  font-size: 1em;
+  color: #fff;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+}
+
+.card-front {
+  background: #9b30ff;
+  transform: rotateY(0deg);
+}
+
+.card-back {
+  background: #6e3ebc;
+  transform: rotateY(180deg);
+}
+
+.card-back img {
+  max-width: 80%;
+  max-height: 80%;
+  object-fit: contain;
+}
+
+button {
+  font-family:'Press Start 2P', cursive;
+  padding:20px 35px;
+  font-size:1.3em;
+  color:#fff;
+  border: 4px solid #8a2be2;
+  border-radius:14px;
+  background-color:#9b30ff;
+  cursor:pointer;
+  box-shadow:0 8px 0 #5a1abf;
+  transition:0.3s;
+  margin-top:20px;
+}
+
+button:hover {
+  background-color:#7b1aff;
+  transform:scale(1.05);
+  text-shadow:2px 2px 5px #d1b3ff;
+}
+
+button:active {
+  transform:translateY(4px);
+  box-shadow:0 4px 0 #5a1abf;
+}
+
+/* Mensaje de juego completado */
+#message {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  background: rgba(0,0,0,0.85);
+  border:4px solid #8a2be2;
+  border-radius:20px;
+  box-shadow:0 0 30px #8a2be2;
+  padding:40px 50px;
+  font-size:1.4em;
+  display:none;
+  flex-direction: column;
+  align-items: center;
+  z-index:10;
+}
+
+#message button {
+  margin-top:25px;
+}
+
+@media(max-width:768px){
+  .game-board { grid-template-columns: repeat(2,1fr); }
+  .card { width:100px; height:140px; }
+  h1 { font-size:1.4em; }
+  button { padding:18px 30px; font-size:1.1em; }
+  #message { font-size:1em; padding:30px 35px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Memorama</h1>
+  <div class="game-board" id="game-board"></div>
+  <a href="{% url 'juegos' %}"><button>Volver</button></a>
+
+  <div id="message">
+    <span>🎉 ¡Felicidades! Has emparejado todas las cartas 🎉</span>
+    <button id="restart">Reiniciar</button>
+  </div>
+</div>
+
+<script>
+const usuarioId = "{{ usuario_id }}";
+
+const cards = [
+  { type: 'image', content: '{% static "imagenes/por favor.jpg" %}', pairId: 'por favor' },
+  { type: 'text', content: 'por favor', pairId: 'por favor' },
+  { type: 'image', content: '{% static "imagenes/no.jpg" %}', pairId: 'no' },
+  { type: 'text', content: 'no', pairId: 'no' },
+  { type: 'image', content: '{% static "imagenes/perdón.jpg" %}', pairId: 'perdón' },
+  { type: 'text', content: 'perdón', pairId: 'perdón' },
+  { type: 'image', content: '{% static "imagenes/sí.jpg" %}', pairId: 'sí' },
+  { type: 'text', content: 'sí', pairId: 'sí' },
+  { type: 'image', content: '{% static "imagenes/gracias.jpg" %}', pairId: 'gracias' },
+  { type: 'text', content: 'gracias', pairId: 'gracias' }
+];
+
+const board = document.getElementById('game-board');
+const messageBox = document.getElementById('message');
+const restartBtn = document.getElementById('restart');
+let flippedCards = [];
+let matchedCount = 0;
+let isProcessing = false;
+
+function shuffle(array) {
+  return array.sort(() => Math.random() - 0.5);
+}
+
+function renderBoard() {
+  board.innerHTML = '';
+  flippedCards = [];
+  matchedCount = 0;
+  messageBox.style.display = 'none';
+
+  const shuffledCards = shuffle([...cards]);
+
+  shuffledCards.forEach(cardData => {
+    const card = document.createElement('div');
+    card.classList.add('card');
+
+    const inner = document.createElement('div');
+    inner.classList.add('card-inner');
+
+    const front = document.createElement('div');
+    front.classList.add('card-front');
+    front.textContent = '?'; // frente oculto
+
+    const back = document.createElement('div');
+    back.classList.add('card-back');
+
+    if(cardData.type === 'image'){
+      const img = document.createElement('img');
+      img.src = cardData.content;
+      back.appendChild(img);
+    } else {
+      back.textContent = cardData.content;
+    }
+
+    inner.appendChild(front);
+    inner.appendChild(back);
+    card.appendChild(inner);
+    card.dataset.pairId = cardData.pairId;
+    board.appendChild(card);
+  });
+}
+
+function flipCard(card){
+  if (isProcessing || card.classList.contains('matched') || card.classList.contains('flipped')) return;
+
+  card.classList.add('flipped');
+  flippedCards.push(card);
+
+  if(flippedCards.length === 2){
+    isProcessing = true;
+    const [c1, c2] = flippedCards;
+    const isMatch = c1.dataset.pairId === c2.dataset.pairId;
+
+    setTimeout(()=>{
+      if(isMatch){
+        c1.classList.add('matched');
+        c2.classList.add('matched');
+        matchedCount += 2;
+
+        if(matchedCount === cards.length){
+          messageBox.style.display = 'flex';
+          const puntajeFinal = matchedCount;
+          const tiempoFinal = 120; // reemplazar si mides tiempo real
+          guardarPuntajeGenerico('Memorama', puntajeFinal, tiempoFinal);
+        }
+      } else {
+        c1.classList.remove('flipped');
+        c2.classList.remove('flipped');
+      }
+      flippedCards = [];
+      isProcessing = false;
+    }, 1000);
+  }
+}
+
+board.addEventListener('click', e=>{
+  const card = e.target.closest('.card');
+  if(card && board.contains(card)) flipCard(card);
+});
+
+restartBtn.addEventListener('click', ()=> renderBoard());
+
+// ----------------- GUARDAR PUNTAJE -----------------
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        let cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function guardarPuntajeGenerico(juegoNombre, puntaje, tiempo) {
+    fetch('/usuarios/guardar_puntaje/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            juego: juegoNombre,
+            puntaje: puntaje,
+            tiempo: tiempo,
+            usuario_id: usuarioId
+        })
+    })
+    .then(res => res.json())
+    .then(data => alert(data.mensaje))
+    .catch(err => alert('Error guardando puntaje'));
+}
+
+renderBoard();
+</script>
+
+<audio id="musicaFondo" src="{% static 'sonidos/musica.mpeg' %}" loop autoplay></audio>
+</body>
+</html>

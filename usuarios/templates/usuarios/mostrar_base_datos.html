@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel de Base de Datos</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<style>
+/* --- estilos básicos, mismos que ya tenías --- */
+body { font-family: 'Poppins', sans-serif; background: #fff; color: #3e1a85; margin:0; padding:0; }
+.topbar { width:100%; background: linear-gradient(135deg, #b589f6, #5e2ebd); padding:15px 20px; color:#fff; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; }
+.topbar h1 { margin:0; font-size:1.4em; font-family:'Playfair Display', serif; }
+.btn-logout { background:#fff; color:#5b2bc0; padding:8px 18px; border-radius:25px; font-weight:bold; border:none; cursor:pointer; }
+.btn-logout:hover { background:#5b2bc0; color:#fff; }
+.contenedor { width:95%; max-width:1000px; margin:25px auto; }
+.acordeon { background: rgba(91,43,192,0.10); border-radius:12px; margin-bottom:15px; box-shadow:0 4px 20px rgba(0,0,0,0.15); overflow:hidden; }
+.acordeon-titulo { background: rgba(91,43,192,0.15); padding:14px 18px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-weight:600; font-size:1.1em; }
+.acordeon-titulo:hover { background: rgba(91,43,192,0.25); }
+.acordeon-contenido { display:none; padding:18px; background:#fff; }
+table { width:100%; border-collapse:collapse; margin-top:10px; }
+th { background:#5e2ebd; color:#fff; padding:10px; border-radius:5px; }
+td { padding:10px; border-bottom:1px solid #ddd; }
+tr:hover td { background: rgba(181,137,246,0.15); }
+.acciones i { font-size:1.2em; cursor:pointer; margin:0 5px; }
+.add-btn { margin-bottom:12px; background:#5e2ebd; color:#fff; padding:8px 14px; border-radius:25px; border:none; cursor:pointer; font-size:0.9em; }
+.add-btn:hover { background:#b589f6; }
+.buscador { width:100%; padding:10px; border-radius:10px; border:1px solid #aaa; margin-bottom:12px; }
+input, select { margin-bottom:8px; padding:6px; width:100%; border-radius:5px; border:1px solid #aaa; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>Panel de Base de Datos</h1>
+  <a href="{% url 'opciones' %}"><button class="btn-logout">Cerrar</button></a>
+</div>
+
+<div class="contenedor">
+
+  <!-- --- USUARIOS --- -->
+  <div class="acordeon">
+    <div class="acordeon-titulo"><span>Usuarios</span><i class="bi bi-chevron-down"></i></div>
+    <div class="acordeon-contenido">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="tipo_tabla" value="usuario">
+        <input name="nombre" placeholder="Nombre">
+        <input name="correo" placeholder="Correo">
+        <input name="contrasena" placeholder="Contraseña" type="password">
+        <button class="add-btn" type="submit">Agregar Usuario</button>
+      </form>
+      <table>
+        <tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Contraseña</th><th>Acciones</th></tr>
+        {% for u in usuarios %}
+        <tr>
+          <td>{{ u.id }}</td>
+          <td>{{ u.nombre }}</td>
+          <td>{{ u.correo }}</td>
+          <td>{{ u.contrasena }}</td>
+          <td class="acciones">
+            <a href="{% url 'editar_usuario' u.id %}"><i class="bi bi-pencil-square"></i></a>
+            <a href="{% url 'eliminar_usuario' u.id %}"><i class="bi bi-trash3"></i></a>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+
+  <!-- --- JUEGOS --- -->
+  <div class="acordeon">
+    <div class="acordeon-titulo"><span>Juegos</span><i class="bi bi-chevron-down"></i></div>
+    <div class="acordeon-contenido">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="tipo_tabla" value="juego">
+        <input name="nombre" placeholder="Nombre del Juego">
+        <button class="add-btn" type="submit">Agregar Juego</button>
+      </form>
+      <table>
+        <tr><th>ID</th><th>Nombre</th><th>Acciones</th></tr>
+        {% for j in juegos %}
+        <tr>
+          <td>{{ j.id }}</td>
+          <td>{{ j.nombre }}</td>
+          <td class="acciones">
+            <a href="{% url 'editar_juego' j.id %}"><i class="bi bi-pencil-square"></i></a>
+            <a href="{% url 'eliminar_juego' j.id %}"><i class="bi bi-trash3"></i></a>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+
+  <!-- --- PUNTAJES --- -->
+  <div class="acordeon">
+    <div class="acordeon-titulo"><span>Puntajes</span><i class="bi bi-chevron-down"></i></div>
+    <div class="acordeon-contenido">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="tipo_tabla" value="puntaje">
+        <select name="usuario">
+          {% for u in usuarios %}<option value="{{ u.id }}">{{ u.correo }}</option>{% endfor %}
+        </select>
+        <select name="juego">
+          {% for j in juegos %}<option value="{{ j.id }}">{{ j.nombre }}</option>{% endfor %}
+        </select>
+        <input name="puntuacion" placeholder="Puntaje">
+        <input name="tiempo" placeholder="Tiempo (segundos)">
+        <button class="add-btn" type="submit">Agregar Puntaje</button>
+      </form>
+      <table>
+        <tr><th>ID</th><th>Usuario</th><th>Juego</th><th>Puntaje</th><th>Tiempo</th><th>Acciones</th></tr>
+        {% for p in puntajes %}
+        <tr>
+          <td>{{ p.id }}</td>
+          <td>{{ p.usuario.correo }}</td>
+          <td>{{ p.juego.nombre }}</td>
+          <td>{{ p.puntuacion }}</td>
+          <td>{{ p.tiempo_segundos }}</td>
+          <td class="acciones">
+            <a href="{% url 'editar_puntaje' p.id %}"><i class="bi bi-pencil-square"></i></a>
+            <a href="{% url 'eliminar_puntaje' p.id %}"><i class="bi bi-trash3"></i></a>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+
+  <!-- --- CONFIGURACIONES --- -->
+  <div class="acordeon">
+    <div class="acordeon-titulo"><span>Configuraciones</span><i class="bi bi-chevron-down"></i></div>
+    <div class="acordeon-contenido">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="tipo_tabla" value="configuracion">
+        <select name="usuario">{% for u in usuarios %}<option value="{{ u.id }}">{{ u.correo }}</option>{% endfor %}</select>
+        <input name="dificultad" placeholder="Dificultad">
+        <label><input type="checkbox" name="sonido"> Sonido activado</label>
+        <button class="add-btn" type="submit">Agregar Configuración</button>
+      </form>
+      <table>
+        <tr><th>ID</th><th>Usuario</th><th>Dificultad</th><th>Sonido</th><th>Acciones</th></tr>
+        {% for c in configuraciones %}
+        <tr>
+          <td>{{ c.id }}</td>
+          <td>{{ c.usuario.correo }}</td>
+          <td>{{ c.dificultad }}</td>
+          <td>{{ c.sonido }}</td>
+          <td class="acciones">
+            <a href="{% url 'editar_configuracion' c.id %}"><i class="bi bi-pencil-square"></i></a>
+            <a href="{% url 'eliminar_configuracion' c.id %}"><i class="bi bi-trash3"></i></a>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+
+  <!-- --- ACTIVIDADES --- -->
+  <div class="acordeon">
+    <div class="acordeon-titulo"><span>Actividades</span><i class="bi bi-chevron-down"></i></div>
+    <div class="acordeon-contenido">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="tipo_tabla" value="actividad">
+        <select name="usuario">{% for u in usuarios %}<option value="{{ u.id }}">{{ u.correo }}</option>{% endfor %}</select>
+        <input name="descripcion" placeholder="Descripción de la actividad">
+        <button class="add-btn" type="submit">Agregar Actividad</button>
+      </form>
+      <table>
+        <tr><th>ID</th><th>Usuario</th><th>Descripción</th><th>Fecha</th><th>Acciones</th></tr>
+        {% for a in actividades %}
+        <tr>
+          <td>{{ a.id }}</td>
+          <td>{{ a.usuario.correo }}</td>
+          <td>{{ a.descripcion }}</td>
+          <td>{{ a.fecha }}</td>
+          <td class="acciones">
+            <a href="{% url 'editar_actividad' a.id %}"><i class="bi bi-pencil-square"></i></a>
+            <a href="{% url 'eliminar_actividad' a.id %}"><i class="bi bi-trash3"></i></a>
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+document.querySelectorAll(".acordeon-titulo").forEach(titulo => {
+  titulo.addEventListener("click", () => {
+    let contenido = titulo.nextElementSibling;
+    contenido.style.display = contenido.style.display === "block" ? "none" : "block";
+  });
+});
+</script>
+
+</body>
+</html>

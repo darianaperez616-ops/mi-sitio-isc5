@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #b589f6, #5e2ebd);
+            color: #fff;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+        }
+        .button-container {
+            display: flex;
+            gap: 20px;
+        }
+        a.btn {
+            text-decoration: none;
+            padding: 14px 35px;
+            border-radius: 30px;
+            background: #ffffff;
+            color: #5b2bc0;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        a.btn:hover {
+            background: #5b2bc0;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Bienvenido {{ user.username }}</h1>
+    <p>Has iniciado sesión correctamente</p>
+
+    <div class="button-container">
+        <!-- ✅ Ir al index del juego -->
+        <a href="{% url 'index' %}" class="btn">Ir al juego</a>
+
+        <!-- ✅ Cerrar sesión (debes tener configurada esta vista en urls.py) -->
+        <a href="{% url 'logout' %}" class="btn">Cerrar sesión</a>
+    </div>
+</body>
+</html>

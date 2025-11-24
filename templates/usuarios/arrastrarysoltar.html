@@ -1,0 +1,336 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Arrastrar y Soltar - Señales</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background-image:url("{% static 'imagenes/fondo.png' %}");
+  font-family:'Press Start 2P', cursive;
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  padding:20px;
+  min-height:100vh;
+}
+
+.container {
+  background: rgba(0,0,0,0.75);
+  border: 4px solid #8a2be2;
+  border-radius: 20px;
+  box-shadow: 0 0 30px #8a2be2;
+  padding: 30px 40px;
+  max-width: 900px;
+  width: 100%;
+  text-align:center;
+}
+
+h1 {
+  font-size: 1.8em;
+  margin-bottom: 15px;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.game-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 50px;
+  margin-top: 20px;
+}
+
+.signs, .targets {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.sign {
+  width: 140px;
+  height: 140px;
+  border: 4px solid #8a2be2;
+  border-radius: 20px;
+  background: #fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor: grab;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  transition: transform 0.2s;
+  touch-action: none; 
+  position: relative;
+}
+
+.sign img {
+  max-width: 85%;
+  max-height: 85%;
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.target {
+  width: 180px;
+  height: 140px;
+  border: 4px dashed #8a2be2;
+  border-radius: 20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: rgba(255,255,255,0.05);
+  font-size: 1em;
+  text-align:center;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.target.correct {
+  border-color: #00ff66;
+  background: rgba(0,255,102,0.2);
+}
+
+.target.wrong {
+  border-color: #ff4d4d;
+  background: rgba(255,77,77,0.2);
+}
+
+.score {
+  margin-top:25px;
+  font-size:18px;
+}
+
+button {
+  margin-top:30px;
+  font-family:'Press Start 2P', cursive;
+  padding:20px 35px;
+  font-size:1.4em;
+  color:#fff;
+  border: 4px solid #8a2be2;
+  border-radius:14px;
+  background-color:#9b30ff;
+  cursor:pointer;
+  box-shadow:0 8px 0 #5a1abf;
+  transition:0.3s;
+}
+
+button:hover {
+  background-color:#7b1aff;
+  transform:scale(1.05);
+  text-shadow:2px 2px 5px #d1b3ff;
+}
+
+button:active {
+  transform:translateY(4px);
+  box-shadow:0 4px 0 #5a1abf;
+}
+
+@media(max-width:600px){
+  .sign { width:120px; height:120px; }
+  .target { width:150px; height:120px; font-size:0.9em; }
+  button { padding:18px 30px; font-size:1.2em; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Arrastra la seña a la palabra correcta</h1>
+
+  <div class="game-container">
+    <div class="signs" id="signs"></div>
+    <div class="targets" id="targets"></div>
+  </div>
+
+  <div class="score">Puntaje: <span id="points">0</span></div>
+
+  <button id="backBtn">Volver al menú de juegos</button>
+</div>
+
+<script>
+const cards = [
+  { image:'{% static "imagenes/por favor.jpg" %}', word:'Por favor' },
+  { image:'{% static "imagenes/no.jpg" %}', word:'No' },
+  { image:'{% static "imagenes/perdón.jpg" %}', word:'Perdón' },
+  { image:'{% static "imagenes/sí.jpg" %}', word:'Sí' },
+  { image:'{% static "imagenes/gracias.jpg" %}', word:'Gracias' }
+];
+
+function shuffle(array){ return array.sort(()=>Math.random()-0.5); }
+
+let score = 0;
+const signsContainer = document.getElementById('signs');
+const targetsContainer = document.getElementById('targets');
+
+function initGame(){
+  signsContainer.innerHTML='';
+  targetsContainer.innerHTML='';
+  score=0;
+  document.getElementById('points').textContent=score;
+
+  const shuffledSigns = shuffle([...cards]);
+  const shuffledTargets = shuffle([...cards]);
+
+  shuffledSigns.forEach(card=>{
+    const div=document.createElement('div');
+    div.classList.add('sign');
+    div.draggable=true;
+    div.dataset.word=card.word;
+    const img=document.createElement('img');
+    img.src=card.image;
+    div.appendChild(img);
+    signsContainer.appendChild(div);
+  });
+
+  shuffledTargets.forEach(card=>{
+    const div=document.createElement('div');
+    div.classList.add('target');
+    div.dataset.word=card.word;
+    div.textContent=card.word;
+    targetsContainer.appendChild(div);
+  });
+
+  enableDragAndTouch();
+}
+
+function enableDragAndTouch(){
+  const signs=document.querySelectorAll('.sign');
+  const targets=document.querySelectorAll('.target');
+
+  signs.forEach(sign=>{
+    sign.addEventListener('dragstart', e=>{
+      e.dataTransfer.setData('text', sign.dataset.word);
+    });
+  });
+
+  targets.forEach(target=>{
+    target.addEventListener('dragover', e=> e.preventDefault());
+    target.addEventListener('drop', e=>{
+      e.preventDefault();
+      const draggedWord=e.dataTransfer.getData('text');
+      checkMatch(draggedWord,target);
+    });
+  });
+
+  signs.forEach(sign=>{
+    let touchClone=null;
+
+    sign.addEventListener('touchstart', e=>{
+      const touch=e.touches[0];
+      touchClone=sign.cloneNode(true);
+      touchClone.style.position='fixed';
+      touchClone.style.left=touch.clientX-60+'px';
+      touchClone.style.top=touch.clientY-60+'px';
+      touchClone.style.opacity='0.8';
+      touchClone.style.zIndex='1000';
+      document.body.appendChild(touchClone);
+    });
+
+    sign.addEventListener('touchmove', e=>{
+      e.preventDefault();
+      const touch=e.touches[0];
+      if(touchClone){
+        touchClone.style.left=touch.clientX-60+'px';
+        touchClone.style.top=touch.clientY-60+'px';
+      }
+    });
+
+    sign.addEventListener('touchend', e=>{
+      if(!touchClone) return;
+      const touch=e.changedTouches[0];
+      const elem=document.elementFromPoint(touch.clientX,touch.clientY);
+      const target=elem?.closest('.target');
+      if(target){
+        checkMatch(sign.dataset.word,target);
+      }
+      touchClone.remove();
+      touchClone=null;
+    });
+  });
+}
+
+function checkMatch(word,target){
+  if(word===target.dataset.word){
+    target.classList.add('correct');
+    score++;
+    document.getElementById('points').textContent=score;
+    const draggedSign=Array.from(document.querySelectorAll('.sign'))
+      .find(s=>s.dataset.word===word);
+    if(draggedSign) draggedSign.style.visibility='hidden';
+  } else {
+    target.classList.add('wrong');
+    setTimeout(()=>target.classList.remove('wrong'),500);
+  }
+}
+
+initGame();
+
+// Volver al menú de juegos usando Django URL
+document.getElementById('backBtn').addEventListener('click', ()=>{
+  location.href="{% url 'juegos' %}";
+});
+
+
+// ----------------- GUARDAR PUNTAJE -----------------
+function getCookie(name) {
+    let cookieValue = null;
+    if(document.cookie && document.cookie!==''){
+        const cookies = document.cookie.split(';');
+        for(let i=0;i<cookies.length;i++){
+            const cookie = cookies[i].trim();
+            if(cookie.substring(0,name.length+1)=== (name+'=')){
+                cookieValue = decodeURIComponent(cookie.substring(name.length+1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function guardarPuntajeGenerico(juegoNombre, puntaje, tiempo){
+    const usuarioId = "{{ usuario_id }}"; 
+ fetch('/usuarios/guardar_puntaje/', {
+    method:'POST',
+    headers:{
+        'Content-Type':'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+    },
+    body: JSON.stringify({
+        juego: juegoNombre,
+        puntaje: puntaje,
+        tiempo: tiempo,
+        usuario_id: usuarioId
+    })
+})
+.then(res => res.json())
+.then(data => alert(data.mensaje))
+.catch(err => alert('Error guardando puntaje'));
+
+}
+function checkMatch(word,target){
+  if(word===target.dataset.word){
+    target.classList.add('correct');
+    score++;
+    document.getElementById('points').textContent=score;
+    const draggedSign=Array.from(document.querySelectorAll('.sign'))
+      .find(s=>s.dataset.word===word);
+    if(draggedSign) draggedSign.style.visibility='hidden';
+
+    // ✅ Aquí verificamos si el juego terminó
+    if(score === cards.length){  // cards.length es el total de señales
+        guardarPuntajeGenerico('Arrastrar y Soltar', score, 0); // 0 o tiempo si lo mides
+        alert('¡Juego terminado! Puntaje guardado.');
+    }
+  } else {
+    target.classList.add('wrong');
+    setTimeout(()=>target.classList.remove('wrong'),500);
+  }
+}
+
+
+</script>
+</body>
+</html>

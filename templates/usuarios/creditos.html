@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>DarSign - Créditos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-image:url("{% static 'imagenes/fondo.png' %}");
+      font-family: 'Press Start 2P', cursive;
+      background: linear-gradient(135deg, #6a00f4, #ff00cc);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+    }
+    .container {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px #ff00cc;
+      max-width: 600px;
+    }
+    h1 {
+      font-size: 22px;
+      margin-bottom: 20px;
+      color: #ffccff;
+    }
+    p {
+      font-size: 14px;
+      margin: 10px 0;
+      line-height: 1.6;
+    }
+    .back-btn {
+      margin-top: 20px;
+      display: inline-block;
+      text-decoration: none;
+    }
+    .back-btn button {
+      background: #6200ea;
+      border: none;
+      padding: 12px 20px;
+      color: #fff;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .back-btn button:hover {
+      background: #3700b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Acerca de / Créditos</h1>
+    <p>Este proyecto fue creado con el objetivo de enseñar y practicar el Lenguaje de Señas de forma interactiva.</p>
+    <p><strong>Equipo de desarrollo: Dariana Lizbeth Perez Peña</strong></p>
+    <p>Ingeniería en Sistemas Computacionales</p>
+    <p>Año: 2025</p>
+    <a href="{% url 'configuracion' %}" class="back-btn"><button>Volver</button></a>
+  </div>
+</body>
+</html>
