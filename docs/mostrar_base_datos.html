@@ -1,0 +1,98 @@
+﻿<!DOCTYPE html>
+<html lang=\"es\">
+<head>
+  <meta charset=\"utf-8\">
+  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">
+  <title>Mostrar Base de Datos</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #b589f6, #5e2ebd);
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.12);
+      padding: 30px;
+      border-radius: 18px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+      backdrop-filter: blur(8px);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .back-btn {
+      background: #fff;
+      color: #5b2bc0;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      cursor: pointer;
+      margin-bottom: 20px;
+      text-decoration: none;
+      display: inline-block;
+      font-weight: bold;
+    }
+
+    .back-btn:hover {
+      background: #5b2bc0;
+      color: #fff;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .data-table th, .data-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .data-table th {
+      background: rgba(255,255,255,0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class=\"container\">
+    <a href=\"acceso_base_datos.html\" class=\"back-btn\">← Volver</a>
+    <h1>Mostrar Base de Datos</h1>
+    
+    <table class=\"data-table\">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Usuario Ejemplo</td>
+          <td>usuario@ejemplo.com</td>
+          <td>2024-01-15</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Admin Sistema</td>
+          <td>admin@sistema.com</td>
+          <td>2024-01-14</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
