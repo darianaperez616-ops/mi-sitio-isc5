@@ -1,14 +1,26 @@
 ﻿from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
 from django.contrib import messages
 
 def login_view(request):
-    # Vista SIMPLE sin base de datos por ahora
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
-        messages.success(request, f'Login exitoso para {email}')
-        return redirect('acceso_base_datos')
+        
+        # Verificar si el usuario existe
+        try:
+            user = User.objects.get(email=email)
+            user = authenticate(request, username=user.username, password=password)
+            
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'¡Bienvenido {user.email}!')
+                return redirect('acceso_base_datos')
+            else:
+                messages.error(request, 'Correo o contraseña incorrectos')
+        except User.DoesNotExist:
+            messages.error(request, 'Correo o contraseña incorrectos')
     
     return render(request, 'usuarios/login.html')
 
@@ -16,32 +28,39 @@ def registro_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
-        messages.success(request, f'Usuario {email} registrado exitosamente')
-        return redirect('login')
+        confirm_password = request.POST.get('confirm_password')
+        
+        # Validaciones
+        if password != confirm_password:
+            messages.error(request, 'Las contraseñas no coinciden')
+            return render(request, 'usuarios/registro.html')
+        
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Este correo ya está registrado')
+            return render(request, 'usuarios/registro.html')
+        
+        # Crear usuario
+        try:
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                password=password
+            )
+            user.save()
+            messages.success(request, '¡Registro exitoso! Ahora puedes iniciar sesión')
+            return redirect('login')
+        except Exception as e:
+            messages.error(request, f'Error en el registro: {str(e)}')
     
     return render(request, 'usuarios/registro.html')
 
 def acceso_base_datos(request):
-    return HttpResponse('''
-    <html>
-    <head>
-        <style>
-            body { 
-                font-family: Arial; 
-                background: linear-gradient(135deg, #b589f6, #5e2ebd);
-                color: white;
-                padding: 40px;
-            }
-            a { color: white; }
-        </style>
-    </head>
-    <body>
-        <h1>Base de Datos</h1>
-        <p>Página de base de datos funcionando</p>
-        <a href="/usuarios/login/">← Volver al Login</a>
-    </body>
-    </html>
-    ''')
+    if not request.user.is_authenticated:
+        messages.error(request, 'Debes iniciar sesión para ver esta página')
+        return redirect('login')
+    
+    users = User.objects.all()
+    return render(request, 'usuarios/base_datos.html', {'users': users})
 
 def index_view(request):
     return redirect('login')

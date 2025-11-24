@@ -1,13 +1,13 @@
 ﻿from pathlib import Path
 import os
-import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-clave-temporal-123456')
-DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
+SECRET_KEY = 'django-insecure-tu-clave-secreta-aqui-123456'
+DEBUG = True
 ALLOWED_HOSTS = ['*']
 
+# APPS NECESARIOS para tu template
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -18,9 +18,9 @@ INSTALLED_APPS = [
     'usuarios',
 ]
 
+# MIDDLEWARE necesario para CSRF y messages
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -30,6 +30,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'sitio_web.urls'
 
+# Configuración de TEMPLATES para Django tags
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -46,25 +47,14 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'sitio_web.wsgi.application'
-
 DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:///db.sqlite3',
-        conn_max_age=600
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
-AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-]
-
-LANGUAGE_CODE = 'es-mx'
-TIME_ZONE = 'America/Mexico_City'
-USE_I18N = True
-USE_TZ = True
+# Para mensajes y sesiones
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
