@@ -1,20 +1,10 @@
-﻿from django.shortcuts import render
-from django.http import HttpResponse
+﻿from django.http import HttpResponse
 
 def login_view(request):
-    return HttpResponse('''
-    <h1>🔐 LOGIN - SITIO FUNCIONANDO</h1>
-    <form>
-        <input type=\"text\" placeholder=\"Usuario\"><br>
-        <input type=\"password\" placeholder=\"Contraseña\"><br>
-        <button>Entrar</button>
-    </form>
-    <p><a href=\"/admin/\">Administración</a></p>
-    <p style=\"color: green;\">✅ El sitio está funcionando en la nube</p>
-    ''')
+    return HttpResponse('<h1>🔐 LOGIN</h1><form><input type=\"text\"><br><input type=\"password\"><br><button>Entrar</button></form>')
 
 def index_view(request):
-    return HttpResponse('<h1>¡Página principal!</h1>')
+    return HttpResponse('<h1>🏠 INICIO</h1>')
 
 def home(request):
-    return render(request, 'usuarios/index.html')
+    return HttpResponse('<h1>📱 HOME</h1>')
