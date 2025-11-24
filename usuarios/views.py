@@ -5,7 +5,7 @@ def login_view(request):
     return render(request, 'usuarios/login.html')
 
 def registro_view(request):
-    return HttpResponse('<h1>Página de registro</h1><p>Próximamente...</p>')
+    return HttpResponse('<h1>Página de registro</h1><a href="/">Volver al login</a>')
 
 def index_view(request):
     return HttpResponse('INDEX')
