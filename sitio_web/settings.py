@@ -1,22 +1,24 @@
 from pathlib import Path
 import os
-import pymysql
-pymysql.install_as_MySQLdb()
+import dj_database_url
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-^2$&3kpna1j#5bujuo$@(text#r-0^#094p1(^t#(v2p#&+3w^'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-clave-temporal-cambiar-en-produccion')
 
-# 🔹 Modo debug automático:
-DEBUG = "False"
+# 🔹 Debug desde variable de entorno
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
+# 🔹 Hosts permitidos
 ALLOWED_HOSTS = [
-    ".elasticbeanstalk.com",
-    ".amazonaws.com",
-    "localhost",
-    "127.0.0.1",
-    ["*"]
+    '.onrender.com',
+    '.elasticbeanstalk.com',
+    '.amazonaws.com', 
+    'localhost',
+    '127.0.0.1'
 ]
 
+# 🔹 Aplicaciones
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -25,31 +27,28 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'usuarios',
-    'rest_framework',  # ← NECESARIO para tus ViewSets
+    'rest_framework',
 ]
 
-
+# 🔹 Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',   # ← OBLIGATORIO
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
 ]
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 
 ROOT_URLCONF = 'sitio_web.urls'
 
-# 🔹 Plantillas (templates)
+# 🔹 Plantillas
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"],  # ← Asegúrate de que esté así
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -62,14 +61,20 @@ TEMPLATES = [
     },
 ]
 
-
 WSGI_APPLICATION = 'sitio_web.wsgi.application'
 
-
-
-# 🔹 Base de datos (automática local ↔ AWS)
-if os.getenv("RDS_HOSTNAME"):
-    # PRODUCCIÓN (AWS RDS)
+# 🔹 BASE DE DATOS CORREGIDA
+if 'DATABASE_URL' in os.environ:
+    # Render PostgreSQL
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL'),
+            conn_max_age=600,
+            ssl_require=True
+        )
+    }
+elif os.getenv("RDS_HOSTNAME"):
+    # AWS RDS MySQL
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -81,7 +86,7 @@ if os.getenv("RDS_HOSTNAME"):
         }
     }
 else:
-    # LOCAL (SQLite)
+    # SQLite local
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -89,7 +94,7 @@ else:
         }
     }
 
-
+# 🔹 Resto de la configuración...
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
@@ -102,10 +107,10 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-
-# 🔹 Static files
+# 🔹 Archivos estáticos
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [BASE_DIR / "static"]  # ← si tienes carpeta static local
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
