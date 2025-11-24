@@ -3,12 +3,7 @@ from django.urls import path
 from django.http import HttpResponse
 
 def home(request):
-    return HttpResponse('
-    <h1 style=\"color: green;\">✅ SITIO REPARADO</h1>
-    <p>El problema era el login. Ahora funciona:</p>
-    <a href=\"/admin/\">🔧 PANEL ADMIN</a><br>
-    <a href=\"/usuarios/index/\">🏠 PÁGINA PRINCIPAL</a>
-    ')
+    return HttpResponse('<h1>✅ SITIO FUNCIONANDO</h1><p>Render deploy fixed</p>')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
