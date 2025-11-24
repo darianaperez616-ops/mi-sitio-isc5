@@ -5,17 +5,29 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 
 def login_view(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        
+        # Buscar usuario por email
+        try:
+            user = User.objects.get(email=email)
+            user = authenticate(request, username=user.username, password=password)
+            
+            if user is not None:
+                login(request, user)
+                return redirect('acceso_base_datos')
+            else:
+                messages.error(request, 'Correo o contraseña incorrectos')
+                return redirect('login')
+                
+        except User.DoesNotExist:
+            messages.error(request, 'Correo o contraseña incorrectos')
+            return redirect('login')
+    
     return render(request, 'usuarios/login.html')
 
 def registro_view(request):
-    return render(request, 'usuarios/registro.html')
-
-def acceso_base_datos(request):
-    # Aquí mostrarías información de la base de datos
-    users = User.objects.all() if User.objects.exists() else []
-    return render(request, 'usuarios/base_datos.html', {'users': users})
-
-def procesar_registro(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -40,30 +52,12 @@ def procesar_registro(request):
         messages.success(request, '¡Registro exitoso! Ahora puedes iniciar sesión')
         return redirect('login')
     
-    return redirect('registro')
+    return render(request, 'usuarios/registro.html')
 
-def procesar_login(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        
-        # Buscar usuario por email
-        try:
-            user = User.objects.get(email=email)
-            user = authenticate(request, username=user.username, password=password)
-            
-            if user is not None:
-                login(request, user)
-                return redirect('acceso_base_datos')
-            else:
-                messages.error(request, 'Correo o contraseña incorrectos')
-                return redirect('login')
-                
-        except User.DoesNotExist:
-            messages.error(request, 'Correo o contraseña incorrectos')
-            return redirect('login')
-    
-    return redirect('login')
+def acceso_base_datos(request):
+    # Aquí mostrarías información de la base de datos
+    users = User.objects.all() if User.objects.exists() else []
+    return render(request, 'usuarios/base_datos.html', {'users': users})
 
 def index_view(request):
     return redirect('login')
