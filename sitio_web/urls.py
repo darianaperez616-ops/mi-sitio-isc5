@@ -1,9 +1,12 @@
 ﻿from django.contrib import admin
 from django.urls import path, include
-from usuarios.views import index_view
+from django.shortcuts import redirect
+
+def root_redirect(request):
+    return redirect('login')  # ¡Redirige al login primero!
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', index_view, name='index'),
+    path('', root_redirect, name='root'),
     path('usuarios/', include('usuarios.urls')),
 ]
